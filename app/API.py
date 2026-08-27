@@ -55,7 +55,7 @@ class API():
         Fonction conteneur pour remplir les tk.Treeview 
         après avoir ajouté, modifier ou supprimé un OC.
         """
-        remplir_tableau(self.tableauGG, self.tableauGC, ["Gacha Plus", "Gacha Club", "Gacha Ultra", "Gacha Luminal", "Gacha Want"])
+        remplir_tableau(self.tableauGG, self.tableauGC, ["Gacha Plus", "Gacha Club", "Gacha Ultra", "Gacha Luminal", "Gacha Want", "Gacha Nox"])
         remplir_tableau(self.tableauGG, self.tableauGL2, ["Gacha Life 2", "Gacha Realms"])
         remplir_tableau(self.tableauGG, self.tableauGN16, "Gacha Nebula v1.6")
         remplir_tableau(self.tableauGG, self.tableauGL, ["Gacha Life", "Gachaverse"])
