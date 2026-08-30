@@ -11,6 +11,7 @@ from app.Fonctions import new_tableau, new_Notebook, remplir_tableau, choisir_co
 from app.Fonctions import on_double_clic_principal, definir_police_color
 from app.FontChooserDialog import FontChooserDialog
 from app.GestionDB import DB
+from app.config import dest_para_json_path, dest_json_path
 
 class API():
     """Classe principale du logciel: l'interface."""
@@ -24,7 +25,8 @@ class API():
         self.root.title("DATABASE GACHA GAMES")
         self.DataBase = DB()
         self.FontChooserDialog = FontChooserDialog
-        self.path1 = os.path.join(os.path.dirname(__file__), "parametres", "parametres.json")
+        self.path1 = dest_para_json_path
+        self.path2 = dest_json_path
         self.bg_color = extraire_texte_depuis_json(self.path1, "bg_color")
         self.btn_color = extraire_texte_depuis_json(self.path1, "btn_color")
         self.police = extraire_texte_depuis_json(self.path1, "police et taille")
@@ -151,10 +153,7 @@ class API():
                 tableauGL2: tableau secondaire Gacha Life 2 et ses mod.
             """
             ligne_select1 = tableauGG.selection()
-            if len(tableauGG.item(ligne_select1, "values")) == 5:
-                a, _, _, _, _ = tableauGG.item(ligne_select1, "values")
-            elif len(tableauGG.item(ligne_select1, "values")) == 6:
-                a, _, _, _, _, _ = tableauGG.item(ligne_select1, "values")
+            a = tableauGG.item(ligne_select1, "values")[0]
             if not ligne_select1:
                 messagebox.showerror("Réessaye", "Sélectionne un OC à supprimer.", icon='error')
                 return
@@ -167,16 +166,15 @@ class API():
                 for tableau in tableaux:
                     for item in tableau.get_children():
                         values = tableau.item(item, "values")
-                        if values[0] == a:
+                        if values[0] == int(a) or values[0] == str(a):
                             tableau.delete(item)
             
-                path = os.path.join(os.path.dirname(__file__), "fichier_code", "codes.json")
-                with open(path, "r", encoding="utf-8") as f:
+                with open(self.path2, "r", encoding="utf-8") as f:
                     codes = json.load(f)
-                del codes[str(values[0])]
-                with open(path, "w", encoding="utf-8") as f:
+                del codes[values[0]]
+                with open(self.path2, "w", encoding="utf-8") as f:
                     json.dump(codes, f, ensure_ascii=False, indent=4)
-                used_ids.discard(a)
+                used_ids.discard(int(a))
 
         def supprimer_oc():
             """
