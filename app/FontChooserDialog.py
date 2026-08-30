@@ -3,6 +3,9 @@ import tkinter as tk
 from tkinter import ttk, font
 import json, os
 
+# Importation interne
+from app.config import dest_para_json_path
+
 class FontChooserDialog:
     """
     Classe secondaire pour choisir la police 
@@ -19,8 +22,8 @@ class FontChooserDialog:
         self.top.transient(parent)
         self.top.grab_set()
 
-        self.parametres_path = os.path.join(os.path.dirname(__file__), "parametres", "parametres.json")
-
+        self.parametres_path = dest_para_json_path
+        
         with open(self.parametres_path, "r", encoding="utf-8") as f:
             self.data = json.load(f)
 
@@ -80,7 +83,7 @@ class FontChooserDialog:
     def on_ok(self):
         """Fonction qui valide le choix de la police."""
         self.result = [self.font_family.get(), self.font_size.get()]
-        fichier_config = "app/parametres/parametres.json"
+        fichier_config = dest_para_json_path
         try:
             with open(fichier_config, "w", encoding="utf-8") as f:
                 json.dump({"police et taille": self.result}, f, ensure_ascii=False, indent=4)
