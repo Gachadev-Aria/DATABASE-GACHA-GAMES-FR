@@ -2,12 +2,15 @@
 import sqlite3, os
 from tkinter import ttk
 
+# Importation interne
+from app.config import dest_db_path
+
 class DB():
     """Classe secondaire pour gérer la SQL Database."""
     def __init__(self):
         """Fonction d'initialisation de la classe pour créer la SQL Database"""
         db_path = os.path.join(os.path.dirname(__file__), "database", "gacha_games.db")
-        self.conn = sqlite3.connect(db_path)
+        self.conn = sqlite3.connect(dest_db_path)
         self.cursor = self.conn.cursor()
         self.cursor.execute("""
         CREATE TABLE IF NOT EXISTS GachaGames (
