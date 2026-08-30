@@ -10,12 +10,12 @@ from random import choice
 
 # Importations internes
 from app.static.Listes import list_games, colonnes_GG, colonnes_sqlGG
+from app.config import dest_json_path, init_files
 
-codes_path = os.path.join(os.path.dirname(__file__), "fichier_code", "codes.json")
+init_files()
 
-with open(codes_path, "r", encoding="utf-8") as f:
+with open(dest_json_path, "r") as f:
     codes = json.load(f)
-
 
 # Composants pour l'API
 
