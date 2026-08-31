@@ -345,7 +345,7 @@ def build_OC(page: tk.Frame, tableauGG: ttk.Treeview, bg_color: str, btn_color: 
 
         codes[str(ID)] = code_oc.strip()
 
-        codes_path = os.path.join(os.path.dirname(__file__), "fichier_code", "codes.json")
+        codes_path = dest_json_path
 
         with open(codes_path, "w", encoding="utf-8") as f:
             json.dump(codes, f, ensure_ascii=False, indent=4)   
