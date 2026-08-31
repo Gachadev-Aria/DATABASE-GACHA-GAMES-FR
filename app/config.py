@@ -7,7 +7,7 @@ if getattr(sys, 'frozen', False):
     source_json_path = os.path.join(application_path, "app", "fichier_code", "codes.json")
     source_para_json_path = os.path.join(application_path, "app", "parametres", "parametres.json")
     if os.name == 'nt':
-        app_data_dir = os.path.join(os.environ['APPDATA'], "DATABSE")
+        app_data_dir = os.path.join(os.environ['APPDATA'], "DATABASE")
     else:
         app_data_dir = os.path.join(os.path.expanduser("~"), ".config", "DATABASE")
 else:
