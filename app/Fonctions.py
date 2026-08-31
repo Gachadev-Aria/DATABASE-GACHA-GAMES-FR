@@ -10,7 +10,7 @@ from random import choice
 
 # Importations internes
 from app.static.Listes import list_games, colonnes_GG, colonnes_sqlGG
-from app.config import dest_json_path, init_files
+from app.config import dest_json_path, init_files, dest_para_json_path
 
 init_files()
 
@@ -345,9 +345,7 @@ def build_OC(page: tk.Frame, tableauGG: ttk.Treeview, bg_color: str, btn_color: 
 
         codes[str(ID)] = code_oc.strip()
 
-        codes_path = dest_json_path
-
-        with open(codes_path, "w", encoding="utf-8") as f:
+        with open(dest_json_path, "w", encoding="utf-8") as f:
             json.dump(codes, f, ensure_ascii=False, indent=4)   
 
         chemin = filedialog.askopenfilename(title="Choisis l'image de l'OC")
@@ -504,15 +502,14 @@ def choisir_couleur(type: str):
     elif type == 'btn':
         couleur = colorchooser.askcolor(title="Choisir la couleur des boutons")
     if couleur[1]:
-        fichier_config = os.path.join(os.path.dirname(__file__), "parametres", "parametres.json")
         try:
-            with open(fichier_config, "r", encoding="utf-8") as f:
+            with open(dest_para_json_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             if type == 'bg':
                 data["bg_color"] = couleur[1]
             elif type == 'btn':
                 data["btn_color"] = couleur[1]
-            with open(fichier_config, "w", encoding="utf-8") as f:
+            with open(dest_para_json_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
         except Exception as e:
             print(f"Erreur lors de l'enregistrement de la couleur: {e}")
