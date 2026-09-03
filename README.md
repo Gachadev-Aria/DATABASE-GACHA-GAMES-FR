@@ -7,12 +7,13 @@ Un logiciel permettant de sauvegarder les OC des jeux pour en garder une trace:
 - Gacha Nebula v1.6
 - Gacha Life + Gachaverse
 - Gacha Nebula v1.6
+- Minimuse
 
 Le projet a commencé le 22/08/2026 et il se basait sur un projet existant de mon ordinateur.
 
 ---
 
-## 📸 Aperçu
+## 📸 Aperçu (Avant Minimuse)
 ![Capture d'écran](app/assets/Capture_d'écran_DATABASE.png)
 
 ---
@@ -37,7 +38,7 @@ Le projet a commencé le 22/08/2026 et il se basait sur un projet existant de mo
 Ce projet a été développé avec l'aide d'outils d'intelligence artificielle (Mistral AI).
 
 **La contribution de l'IA** inclut :
-- la création de la class FontChooserDialog avec quelques modifications personnelles
+- la création des classes FontChooserDialog, Config avec quelques modifications personnelles
 - une partie de mon apprentissage sur SQL
 - la résolution d'erreurs non comprises
 - des fonctionnalités spécifiques 
