@@ -4,7 +4,7 @@ from tkinter import messagebox, ttk
 import json, pyperclip, os
 
 # Imports de modules internes
-from app.static.Listes import colonnes_GG, colonnes_G, colonnes_sqlG, colonnes_sqlGG, liste_all
+from app.static.Listes import colonnes_GG, colonnes_G, colonnes_sqlG, colonnes_sqlGG, liste_all, games
 from app.Fonctions import  build_OC, modifier_élément_ligne_OC, convertir, on_double_clic_secondaire
 from app.Fonctions import trier_colonne, extraire_texte_depuis_json, new_scrollbar
 from app.Fonctions import new_tableau, new_Notebook, remplir_tableau, choisir_couleur
@@ -24,6 +24,7 @@ class API():
         self.root.attributes("-fullscreen", True)
         self.root.title("DATABASE GACHA GAMES")
         self.DataBase = DB()
+        self.cursor = "star"
         self.FontChooserDialog = FontChooserDialog
         self.path1 = dest_para_json_path
         self.path2 = dest_json_path
@@ -34,13 +35,13 @@ class API():
         self.creer_API()
         self.load()
 
-    def update(self):
+    def add(self):
         """
         Fonction conteneur permettant de mettre à jour 
         la SQL Database.
         """
-        self.DataBase.update_db(self.tableauGG, self.tableauGC, self.tableauGL, self.tableauGL2, self.tableauGN16)
-
+        self.DataBase.add_db(self.tableauGG, self.tableauGC, self.tableauGN16, self.tableauGL2, self.tableauGL, self.tableauMM)
+        
     def load(self):
         """
         Fonction conteneur pour charger les données 
@@ -51,6 +52,7 @@ class API():
         self.DataBase.load_data(self.tableauGL2, "GachaLife2")
         self.DataBase.load_data(self.tableauGN16, "GachaNebula16")
         self.DataBase.load_data(self.tableauGL, "GachaLife")
+        self.DataBase.load_data(self.tableauMM, "Minimuse")
 
     def remplir_tableaux(self):
         """
@@ -61,6 +63,7 @@ class API():
         remplir_tableau(self.tableauGG, self.tableauGL2, ["Gacha Life 2", "Gacha Realms"])
         remplir_tableau(self.tableauGG, self.tableauGN16, "Gacha Nebula v1.6")
         remplir_tableau(self.tableauGG, self.tableauGL, ["Gacha Life", "Gachaverse"])
+        remplir_tableau(self.tableauGG, self.tableauMM, "Minimuse")
 
     def creer_triof(self, page: tk.Frame):
         """
@@ -73,13 +76,16 @@ class API():
         self.triof.pack(side="right", anchor="nw", pady=2, padx=2)
         tk.Button(
             self.triof, text="  ×  ", background="#FF0000", foreground="#000000", 
-            command=self.quit, relief="groove", font=self.police).pack(side="right")
+            command=self.quit, relief="groove", font=self.police, cursor=self.cursor
+            ).pack(side="right")
         tk.Button(
             self.triof, text="  -  ", background="#FFFFFF", foreground="#000000", 
-            command=lambda: self.reduce(), relief="groove", font=self.police).pack(side="right")
+            command=lambda: self.reduce(), relief="groove", font=self.police, cursor=self.cursor
+            ).pack(side="right")
         tk.Button(
             self.triof, text="Besoin de convertir ?", bg='#FFFFFF', fg='black', font=self.police, 
-            relief="groove", command=lambda: convertir()).pack(side="right", pady=3, anchor='n')
+            relief="groove", command=lambda: convertir(), cursor=self.cursor
+            ).pack(side="right", pady=3, anchor='n')
         
     def reinitialiser(self):
         """
@@ -135,11 +141,11 @@ class API():
             build_OC(self.pageGG, self.tableauGG, self.bg_color, self.btn_color, self.police, next_id)
             used_ids.add(next_id)
             self.remplir_tableaux()
-            self.update()
+            self.add()
 
         def supprimer_OC(tableauGG: ttk.Treeview, tableauGC: ttk.Treeview, 
                          tableauGN16: ttk.Treeview, tableauGL2: ttk.Treeview, 
-                         tableauGL: ttk.Treeview):
+                         tableauGL: ttk.Treeview) -> int:
             """
             Fonction permettant de supprimer une ligne (un OC) dans le 
             tk.Treeview tableauGG, le tableau principal et dans 
@@ -151,12 +157,15 @@ class API():
                 tableauGC: tableau secondaire Gacha Club et ses mod.
                 tableauGN16: tableau secondaire Gacha Nebula v1.6.
                 tableauGL2: tableau secondaire Gacha Life 2 et ses mod.
+                tableauMM: tableau secondaire Minimuse.
+            Returns:
+                a: l'Id de l'OC supprimé.
             """
             ligne_select1 = tableauGG.selection()
-            a = tableauGG.item(ligne_select1, "values")[0]
             if not ligne_select1:
                 messagebox.showerror("Réessaye", "Sélectionne un OC à supprimer.", icon='error')
                 return
+            a = tableauGG.item(ligne_select1, "values")[0]
             
             response = messagebox.askyesno("Mais ?...", "Veux-tu vraiment supprimer cet OC ?", icon="question")
 
@@ -175,6 +184,7 @@ class API():
                 with open(self.path2, "w", encoding="utf-8") as f:
                     json.dump(codes, f, ensure_ascii=False, indent=4)
                 used_ids.discard(int(a))
+            return a
 
         def supprimer_oc():
             """
@@ -186,9 +196,8 @@ class API():
             -(re)remplir les tk.Treeview tableauGC, tableauGN16, tableauGL2, tableauGL
             -mettre à jour la SQL Database.
             """
-            supprimer_OC(self.tableauGG, self.tableauGC, self.tableauGN16, self.tableauGL2, self.tableauGL)
-            self.remplir_tableaux()
-            self.update()
+            id = supprimer_OC(self.tableauGG, self.tableauGC, self.tableauGN16, self.tableauGL2, self.tableauGL, self.tableauMM)
+            self.DataBase.delete_db(id)
 
         def modifier_élément_oc():
             """
@@ -202,7 +211,7 @@ class API():
             """
             modifier_élément_ligne_OC(self.tableauGG, self.Notebook, self.bg_color, self.btn_color, self.police)
             self.remplir_tableaux()
-            self.update()
+            self.add()
 
         def copier_code(tableau: ttk.Treeview):
             """
@@ -239,10 +248,11 @@ class API():
         self.Notebook, self.pages = new_Notebook(self.page_conteneur, liste_all, self.bg_color, self.btn_color, self.police)
 
         self.pageGG = self.pages["Gacha Games"]
-        self.pageGL = self.pages["Gacha Life"]
-        self.pageGC = self.pages["Gacha Club"]
-        self.pageGL2 = self.pages["Gacha Life 2"]
-        self.pageGN16 = self.pages["Gacha Nebula v1.6"]
+         self.pageGL = self.pages["GL"]
+        self.pageGC = self.pages["GC"]
+        self.pageGL2 = self.pages["GL2"]
+        self.pageGN16 = self.pages["GN"]
+        self.pageMM = self.pages["MM"]
 
         self.tableauGG = new_tableau(self.pageGG, self.police, self.bg_color, colonnes_GG, colonnes_sqlGG, 200, trier_colonne)
         self.tableauGG.bind("<Double-1>", lambda event: on_double_clic_principal(self.tableauGG, self.ImageOC))
@@ -254,31 +264,45 @@ class API():
         self.tableauGL2.bind("<Double-1>", lambda event: on_double_clic_secondaire(self.tableauGL2, self.ImageOC))
         self.tableauGN16 = new_tableau(self.pageGN16, self.police, self.bg_color, colonnes_G, colonnes_sqlG, 230, trier_colonne)
         self.tableauGN16.bind("<Double-1>", lambda event: on_double_clic_secondaire(self.tableauGN16, self.ImageOC))
+        self.tableauMM = new_tableau(self.pageMM, self.police, self.bg_color, colonnes_G, colonnes_sqlG, 230, trier_colonne)
+        self.tableauMM.bind("<Double-1>", lambda event: on_double_clic_secondaire(self.tableauMM, self.ImageOC))
         
         new_scrollbar(self.tableauGG)
         new_scrollbar(self.tableauGL)
         new_scrollbar(self.tableauGC)
         new_scrollbar(self.tableauGL2)
         new_scrollbar(self.tableauGN16)
+        new_scrollbar(self.tableauMM)
 
         self.FrameBtn = tk.Frame(self.pageGG, bg=self.bg_color)
         self.FrameBtn.pack(side="top")
 
-        tk.Button(
+        self.btn_add = tk.Button(
             self.FrameBtn, text="Ajouter un OC", bg=self.btn_color, fg=definir_police_color(self.btn_color), 
-            font=self.police, command=ajouter_oc).pack(side="left", padx=3, pady=3, anchor='n')
-        tk.Button(
+            font=self.police, command=ajouter_oc, cursor=self.cursor)
+        self.btn_add.pack(side="left", padx=3, pady=3, anchor='n')
+        self.btn_delete = tk.Button(
             self.FrameBtn, text="Supprimer un OC", bg=self.btn_color, fg=definir_police_color(self.btn_color), 
-            font=self.police,command=supprimer_oc).pack(side="left", padx=3, pady=3, anchor='n')
-        tk.Button(
-            self.FrameBtn, text="Modifier un OC", bg=self.btn_color, fg=definir_police_color(self.btn_color), 
-            font=self.police, command=modifier_élément_oc).pack(
-                side="left",  padx=3, pady=3, anchor='n')
-        tk.Button(
+            font=self.police, command=supprimer_oc, cursor=self.cursor)
+        self.btn_delete.pack(side="left", padx=3, pady=3, anchor='n')
+        self.btn_modify = tk.Button(
+            self.FrameBtn, text="Changer un OC", bg=self.btn_color, fg=definir_police_color(self.btn_color), 
+            font=self.police, command=modifier_élément_oc, cursor=self.cursor)
+        self.btn_modify.pack(side="left", padx=3, pady=3, anchor='n')
+        self.btn_customize = tk.Button(
             self.FrameBtn, text="Personnaliser DATABASE", bg=self.btn_color, fg=definir_police_color(self.btn_color), 
-            font=self.police, command=lambda: self.personnaliser(self.pageGG)
-            ).pack(side="left",  padx=3, pady=3, anchor='n')
+            font=self.police, command=lambda: self.personnaliser(self.pageGG), cursor=self.cursor
+            )
+        self.btn_customize.pack(side="left", padx=3, pady=3, anchor='n')
 
+        self.listgames = tk.LabelFrame(
+            self.page_conteneur, text="Liste des Jeux Gacha", font=self.police, height=200, width=300, bg=self.bg_color,
+            borderwidth=3, border=3, fg=definir_police_color(self.bg_color))
+        self.listgames.pack()
+
+        text_games = "   ".join(games[0:4]) + "\n\n" + "   ".join(games[4:8]) + "\n\n" + "    ".join(games[8:12])
+
+        tk.Label(self.listgames, text=text_games, font=self.police, bg=self.bg_color, fg=definir_police_color(self.bg_color)).pack(padx=5, pady=5)
 
         self.page_conteneur2 = tk.Frame(self.pageBG, bg=self.bg_color)
         self.page_conteneur2.place(x=1510, y=65, anchor='ne')  
