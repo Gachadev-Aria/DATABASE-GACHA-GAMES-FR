@@ -9,7 +9,7 @@ from color_contrast import AccessibilityLevel, check_contrast
 from random import choice
 
 # Importations internes
-from app.static.Listes import list_games, colonnes_GG, colonnes_sqlGG
+from app.static.Listes import games, colonnes_GG, colonnes_sqlGG
 from app.config import dest_json_path, init_files, dest_para_json_path
 
 init_files()
@@ -44,7 +44,7 @@ def new_tableau(page: tk.Frame, police: tuple[str, int], bg_color: str, colonnes
         a: ipady du tableau.
         fct: fonction liée aux en-têtes du tableau.
     """
-    tableau = ttk.Treeview(page, columns=colonnesSQL, show="headings")
+    tableau = ttk.Treeview(page, columns=colonnesSQL, show="headings", cursor="circle")
     style = ttk.Style()
     style.configure(
         "Treeview.Heading",
@@ -149,7 +149,7 @@ def Top_level_build_oc(page: tk.Frame, bg_color: str, btn_color: str, police: tu
     titre_choix = tk.LabelFrame(main_frame, text="Jeux", font=police, bg=bg_color)
     titre_choix.pack(fill="x", pady=5)
 
-    liste = tk.Listbox(titre_choix, height=4, selectmode=tk.SINGLE, font=police)
+    liste = tk.Listbox(titre_choix, height=4, selectmode=tk.SINGLE, font=police, cursor="sizing")
     for jeu in list_games:
         liste.insert(tk.END, jeu)
     liste.pack(fill="x", padx=10, pady=5)
@@ -172,12 +172,12 @@ def Top_level_build_oc(page: tk.Frame, bg_color: str, btn_color: str, police: tu
 
     ok_btn = tk.Button(
         button_frame, text="Valider", bg=btn_color, fg=definir_police_color(btn_color), 
-        font=police, command=save_and_close)
+        font=police, command=save_and_close, cursor="star")
     ok_btn.pack(side=tk.RIGHT, padx=5)
 
     cancel_btn = tk.Button(
         button_frame, text="Annuler", bg=btn_color, fg=definir_police_color(btn_color), 
-        font=police, command=dialog.destroy)
+        font=police, command=dialog.destroy, cursor="star")
     cancel_btn.pack(side=tk.RIGHT, padx=5)
 
     page.wait_window(dialog)
@@ -226,7 +226,7 @@ def Top_level_modifier_oc(page: tk.Frame, bg_color: str, btn_color: str, police:
             dialog.geometry("600x400")
             titre_choix = tk.LabelFrame(main_frame, text="Jeux", font=police, bg=bg_color)
             titre_choix.pack(fill="x", pady=5)
-            liste = tk.Listbox(titre_choix, height=4, selectmode=tk.SINGLE, font=police)
+            liste = tk.Listbox(titre_choix, height=4, selectmode=tk.SINGLE, font=police, cursor="sizing")
             for jeu in list_games:
                 liste.insert(tk.END, jeu)
             liste.pack(fill="x", padx=10, pady=5)
@@ -254,12 +254,12 @@ def Top_level_modifier_oc(page: tk.Frame, bg_color: str, btn_color: str, police:
 
         ok_btn = tk.Button(
             button_frame, text="Valider", bg=btn_color, fg=definir_police_color(btn_color), 
-            font=police, command=save_and_close)
+            font=police, command=save_and_close, cursor="star")
         ok_btn.pack(side=tk.RIGHT, padx=5)
     
         cancel_btn = tk.Button(
             button_frame, text="Annuler", bg=btn_color, fg=definir_police_color(btn_color), 
-            font=police, command=dialog.destroy)
+            font=police, command=dialog.destroy, cursor="star")
         cancel_btn.pack(side=tk.RIGHT, padx=5)
     
         page.wait_window(dialog)
