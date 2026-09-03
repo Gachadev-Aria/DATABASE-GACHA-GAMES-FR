@@ -1,5 +1,5 @@
 # Imporataions externes
-import sqlite3, os
+import sqlite3
 from tkinter import ttk
 
 # Importation interne
@@ -9,7 +9,6 @@ class DB():
     """Classe secondaire pour gérer la SQL Database."""
     def __init__(self):
         """Fonction d'initialisation de la classe pour créer la SQL Database"""
-        db_path = os.path.join(os.path.dirname(__file__), "database", "gacha_games.db")
         self.conn = sqlite3.connect(dest_db_path)
         self.cursor = self.conn.cursor()
         self.cursor.execute("""
@@ -21,7 +20,7 @@ class DB():
             DATE TEXT DEFAULT CURRENT_DATE
         );""")
 
-        self.tables = ["GachaClub", "GachaLife2", "GachaNebula16", "GachaLife"]
+        self.tables = ["GachaClub", "GachaLife2", "GachaNebula16", "GachaLife", "Minimuse"]
         
         for table in self.tables:
             self.cursor.execute(f"""
@@ -49,9 +48,9 @@ class DB():
         for row in rows:
             tree.insert("", "end", values=row)
 
-    def update_db1(self, tableauGG: ttk.Treeview):
+    def add_db1(self, tableauGG: ttk.Treeview):
         """
-        Fonction permettant de mettre à jour la table 
+        Fonction permettant d'ajouter des données dans la table 
         SQL GachaGames de la SQL Database avec les lignes 
         du ttk.Treview tableauGG.
         Args:
@@ -72,17 +71,17 @@ class DB():
                 """, values)
         self.conn.commit()
 
-    def update_db2(self, tableauG_: ttk.Treeview, name_table: str):
+    def add_db2(self, tableauG: ttk.Treeview, name_table: str):
         """
-        Fonction permettant de mettre à jour la table 
+        Fonction permettant d'ajouter des données dans la table 
         SQL Gacha____ de la SQL Database avec les lignes 
-        du ttk.Treview tableauG_.
+        du ttk.Treview tableauG.
         Args:
-            tableauG_:
+            tableauG:
         """
         self.cursor.execute(f"DELETE FROM {name_table}")
-        for item in tableauG_.get_children():
-            values = tableauG_.item(item, "values")
+        for item in tableauG.get_children():
+            values = tableauG.item(item, "values")
             if len(values) == 4:
                 self.cursor.execute(f"""
                 INSERT OR REPLACE INTO {name_table} (CharacterId, CharacterName, CharacterImage, DATE)
@@ -95,25 +94,40 @@ class DB():
                 """, values)
             self.conn.commit()
 
-    def update_db(
+    def add_db(
             self, tableauGG: ttk.Treeview, tableauGC: ttk.Treeview, 
             tableauGN16: ttk.Treeview, tableauGL2: ttk.Treeview, 
-            tableauGL: ttk.Treeview):
+            tableauGL: ttk.Treeview, tableauMM: ttk.Treeview):
         """
-        Fonction conteneur permettant de mettre à jour les tables 
+        Fonction conteneur permettant d'ajouter des données dans les tables 
         SQL GachaGames, GachaClub, GachaLife2, GachaNebula16,
-        Gacha Life, de la SQL Database avec les ttk.Treview 
-        tableauGG, tableauGC, tableauGL2, tableauGN16, tableauGL.
+        Gacha Life, Minimuse, de la SQL Database avec les ttk.Treview 
+        tableauGG, tableauGC, tableauGL2, tableauGN16, tableauGL, tableauMM.
         Args:
             tableauGG: 
             tableauGC: 
             tableauGL: 
             tableauGL2: 
             tableauGN16:
+            tableauMM:
         """
-        self.update_db1(tableauGG)
-        self.update_db2(tableauGC, "GachaClub")
-        self.update_db2(tableauGL2, "GachaLife2")
-        self.update_db2(tableauGN16, "GachaNebula16")
-        self.update_db2(tableauGL, "GachaLife")
+        self.add_db1(tableauGG)
+        self.add_db2(tableauGC, "GachaClub")
+        self.add_db2(tableauGL2, "GachaLife2")
+        self.add_db2(tableauGN16, "GachaNebula16")
+        self.add_db2(tableauGL, "GachaLife")
+        self.add_db2(tableauMM, "Minimuse")
 
+    def delete_db(self, id: int):
+        """
+        Fonction permettant de supprimer un élément de la SQL Database.
+        Args:
+            id: l'Id de l'OC à supprimer.
+        """
+        self.cursor.execute("DELETE FROM GachaGames WHERE CharacterId = ?", (id,))
+        self.cursor.execute("DELETE FROM GachaClub WHERE CharacterId = ?", (id,))
+        self.cursor.execute("DELETE FROM GachaLife2 WHERE CharacterId = ?", (id,))
+        self.cursor.execute("DELETE FROM GachaNebula16 WHERE CharacterId = ?", (id,))
+        self.cursor.execute("DELETE FROM GachaLife WHERE CharacterId = ?", (id,))
+        self.cursor.execute("DELETE FROM Minimuse WHERE CharacterId = ?", (id,))
+        self.conn.commit()
